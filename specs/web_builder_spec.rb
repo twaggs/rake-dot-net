@@ -1,8 +1,11 @@
+require "./lib/command_shell.rb"
 require "./lib/web_builder.rb"
 
 describe "when initializing web builder" do
   before(:each) do 
     Dir.stub!(:pwd).and_return("c:\\dev")
+    @command_shell = mock("CommandShell")
+    CommandShell.stub!(:new).and_return(@command_shell)
     @builder = WebBuilder.new
   end
 
@@ -21,12 +24,25 @@ describe "when initializing web builder" do
   it "sets destination dirctory to default value" do
     @builder.destination.should == "c:\\inetpub\\wwwroot\\"
   end
+
+  describe "build command" do
+    before(:each) do
+      @builder.source = "c:\\development\\somesolution\\somemvcapp\\"
+      @builder.destination = "c\\develpment\\somesolution\\temp\\"
+    end
+
+    it "sets build command using source and desination" do
+      @builder.build_command(@builder.source, @builder.destination).should == "\"#{@builder.path}\" \"#{@builder.temp}\" -u -v \"\/\" -p \"#{@builder.source}\""
+    end
+  end
 end
 
 describe "when executing build" do
   before(:each) do
     Dir.stub!(:pwd).and_return("z:\\dev")
-    File.stub!(:rm_rf)
+    FileUtils.stub!(:rm_rf)
+    @command_shell = mock("CommandShell")
+    CommandShell.stub!(:new).and_return(@command_shell)
     @builder = WebBuilder.new 
   end
 
@@ -51,21 +67,29 @@ describe "when executing build" do
   context "source directory is valid" do
     before(:each) do
       @builder.source = "c:\\development\\foo"
+      @builder.stub!(:build_command).and_return("build command")
+      @command_shell.stub(:execute)
       File.stub!(:directory?).with(@builder.source).and_return(true)
     end
     
     it "deletes temp directory" do
-      File.should_receive(:rm_rf).with(@builder.temp)
+      FileUtils.should_receive(:rm_rf).with(@builder.temp)
 
       @builder.build
     end
 
-    it "deletes destination directory" do
-      @builder.destination = "z:\\inetpub\\wwwroot\\"
-      File.should_receive(:rm_rf).with(@builder.destination)
+    it "executes build command" do
+      @command_shell.should_receive(:execute).with("build command")
 
       @builder.build
     end
+  end
+
+  xit "deletes destination directory" do
+    @builder.destination = "z:\\inetpub\\wwwroot\\"
+    FileUtils.should_receive(:rm_rf).with(@builder.destination)
+
+    @builder.build
   end
 
   context "source directory invalid" do
