@@ -40,6 +40,7 @@ end
 describe "when executing build" do
   before(:each) do
     Dir.stub!(:pwd).and_return("z:\\dev")
+    Dir.stub!(:glob).and_return([])
     FileUtils.stub!(:rm_rf)
     @command_shell = mock("CommandShell")
     CommandShell.stub!(:new).and_return(@command_shell)
@@ -64,6 +65,7 @@ describe "when executing build" do
     end
   end
 
+
   context "source directory is valid" do
     before(:each) do
       @builder.source = "c:\\development\\foo"
@@ -83,13 +85,39 @@ describe "when executing build" do
 
       @builder.build
     end
-  end
 
-  xit "deletes destination directory" do
-    @builder.destination = "z:\\inetpub\\wwwroot\\"
-    FileUtils.should_receive(:rm_rf).with(@builder.destination)
+    context "scrub files specified" do
+      before(:each) { @builder.scrub = ["FakeMail", "AppData"] }
 
-    @builder.build
+      it "deletes each file (or directory) specified" do
+        FileUtils.should_receive(:rm_rf).with(File.join(@builder.temp, "FakeMail"))
+        FileUtils.should_receive(:rm_rf).with(File.join(@builder.temp, "AppData"))
+
+        @builder.build
+      end
+    end
+
+    context ".csproj file exists in output directory" do
+      before(:each) do
+        Dir.stub!(:glob).with(File.join(@builder.temp, "*.csproj*")).and_return(["Web.csproj", "Web.csproj.bak", "Web.csproj.user"])
+      end
+
+      it "returns the project file" do
+        @builder.project_files.should == ["Web.csproj", "Web.csproj.bak", "Web.csproj.user"]
+      end
+
+      it "removes cs proj files from the temp directory" do
+        FileUtils.should_receive(:rm).with(["Web.csproj", "Web.csproj.bak", "Web.csproj.user"])
+
+        @builder.build
+      end
+    end
+
+    it "removed Properties directory" do
+      FileUtils.should_receive(:rm_rf).with(File.join(@builder.temp, "Properties"))
+
+      @builder.build
+    end
   end
 
   context "source directory invalid" do

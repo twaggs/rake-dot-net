@@ -1,7 +1,7 @@
 require 'fileutils'
 
 class WebBuilder
-  attr_accessor :path, :source, :temp, :destination
+  attr_accessor :path, :source, :temp, :destination, :scrub
 
   def initialize()
     @path = "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\aspnet_compiler.exe"
@@ -12,8 +12,24 @@ class WebBuilder
 
   def build()
     raise RuntimeError, "source (web project directory) doesn't exists or has not been specified" if !source?
+
     FileUtils.rm_rf(@temp)
+
     @command_shell.execute(build_command(source, destination))
+
+    FileUtils.rm project_files
+
+    FileUtils.rm_rf(in_temp("Properties"))
+
+    scrub.each { |f| FileUtils.rm_rf in_temp(f) } if !scrub.nil?
+  end
+
+  def project_files()
+    return Dir.glob(in_temp("*.csproj*"))
+  end
+
+  def in_temp(pattern)
+    return File.join(temp, pattern)
   end
 
   def source?
