@@ -1,18 +1,16 @@
 class CommandShell
   def execute cmd
-    puts cmd + "\n\n"
-
-    str=""
+    puts cmd
+    str = ""
     STDOUT.sync = true
-    IO.popen(cmd+" 2>&1") do |pipe| 
+    IO.popen(cmd + " 2>&1") do |pipe| 
       pipe.sync = true
       while s = pipe.gets
         str += s
       end
     end
+    puts str
     
-    puts str + "\n\n"
-
-    str
+    return str
   end
 end

@@ -1,42 +1,41 @@
 require 'fileutils'
 
 class WebBuilder
-  attr_accessor :path, :source, :temp, :destination, :scrub
+  attr_accessor :asp_compiler_path
 
   def initialize()
-    @path = "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\aspnet_compiler.exe"
-    @temp = "#{Dir.pwd}\\temp\\"
-    @destination = "c:\\inetpub\\wwwroot\\"
+    @asp_compiler_path = "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\aspnet_compiler.exe"
+    @destination = "c:\\inetpub\\wwwroot"
     @command_shell = CommandShell.new
   end
 
-  def build()
-    raise RuntimeError, "source (web project directory) doesn't exists or has not been specified" if !source?
+  def build(source, destination, delete_after = nil)
+    raise RuntimeError, "source (web project directory) doesn't exists or has not been specified" if !source? source
 
-    FileUtils.rm_rf(@temp)
+    FileUtils.rm_rf(destination)
 
-    @command_shell.execute(build_command(source, destination))
+    @command_shell.execute(command(source, destination))
 
-    FileUtils.rm project_files
+    FileUtils.rm project_files(destination)
 
-    FileUtils.rm_rf(in_temp("Properties"))
+    FileUtils.rm_rf(in_dir(destination, "Properties"))
 
-    scrub.each { |f| FileUtils.rm_rf in_temp(f) } if !scrub.nil?
+    delete_after.each { |f| FileUtils.rm_rf in_dir(destination, f) } if !delete_after.nil?
   end
 
-  def project_files()
-    return Dir.glob(in_temp("*.csproj*"))
+  def project_files(destination)
+    return Dir.glob(in_dir(destination, "*.csproj*"))
   end
 
-  def in_temp(pattern)
-    return File.join(temp, pattern)
+  def in_dir(destination, pattern)
+    return File.join(destination, pattern)
   end
 
-  def source?
-    return File.directory? @source
+  def source? directory
+    return File.directory? directory
   end
 
-  def build_command(source, destination)
-    return "\"#{path}\" \"#{temp}\" -u -v \"\/\" -p \"#{source}\""
+  def command(source, destination)
+    return "\"#{asp_compiler_path}\" \"#{destination}\" -u -v \"\/\" -p \"#{source}\""
   end
 end
