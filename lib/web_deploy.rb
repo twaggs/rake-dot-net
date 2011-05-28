@@ -1,6 +1,6 @@
 require 'fileutils'
 
-class WebBuilder
+class WebDeploy
   attr_accessor :asp_compiler_path
 
   def initialize()
@@ -9,10 +9,12 @@ class WebBuilder
     @command_shell = CommandShell.new
   end
 
-  def build(source, destination, delete_after = nil)
+  def deploy(source, destination, delete_after = nil, delete_before = nil)
     raise RuntimeError, "source (web project directory) doesn't exists or has not been specified" if !source? source
 
     FileUtils.rm_rf(destination)
+
+    delete_before.each { |f| FileUtils.rm_rf in_dir(source, f) } if !delete_before.nil?
 
     @command_shell.execute(command(source, destination))
 
