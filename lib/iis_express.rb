@@ -18,6 +18,6 @@ class IISExpress
   end
 
   def command(path, port)
-    return "start /d\"#{ execution_path }\" iisexpress /path:\"#{ path }\" /port:#{ port }"
+    return "start /d\"#{ execution_path }\" /MIN iisexpress /path:\"#{ path }\" /port:#{ port }"
   end
 end

@@ -11,7 +11,7 @@ describe "when executing iis express" do
   end
 
   it "provides iis express command for directory and port" do
-    @iis_express.command(@path, @port).should == "start /d\"#{ @iis_express.execution_path }\" iisexpress /path:\"#{ @path }\" /port:#{ @port }"
+    @iis_express.command(@path, @port).should == "start /d\"#{ @iis_express.execution_path }\" /MIN iisexpress /path:\"#{ @path }\" /port:#{ @port }"
   end
 
   it "starts iis" do
