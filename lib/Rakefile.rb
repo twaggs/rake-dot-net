@@ -14,7 +14,7 @@ task :rake_dot_net_initialize do
   @solution_name = "SomeSolution.sln"
   @mvc_project_directory = "SomeMvcApp"
   @test_dll = "./SomeTestProject/bin/debug/SomeTestProject.dll"
-  @test_runner_command = "./packages/nspec.0.9.42/tools/NSpecRunner.exe #{@test_dll}"
+  @test_runner_command = "./packages/nspec.0.9.43/tools/NSpecRunner.exe #{@test_dll}"
   
   @iis_express = IISExpress.new
   @web_deploy = WebDeploy.new
