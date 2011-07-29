@@ -6,20 +6,26 @@ require './RakeDotNet/command_shell.rb'
 require './RakeDotNet/web_deploy.rb'
 require './RakeDotNet/iis_express.rb'
 require './RakeDotNet/sln_builder.rb'
+require './RakeDotNet/file_sync.rb'
 require 'net/http'
+require 'yaml'
 
 task :rake_dot_net_initialize do
-  @website_port = 3000
-  @website_deploy_directory = 'c:\iisexpress\website'
-  @solution_name = "SomeSolution.sln"
-  @mvc_project_directory = "SomeMvcApp"
-  @test_dll = "./SomeTestProject/bin/debug/SomeTestProject.dll"
-  @test_runner_command = "./packages/nspec.0.9.43/tools/NSpecRunner.exe #{@test_dll}"
+  yml = YAML::load File.open("dev.yml")
+  @website_port = yml["website_port"]
+  @website_deploy_directory = yml["website_deploy_directory"]
+  @solution_name = yml["solution_name"]
+  @mvc_project_directory = yml["mvc_project_directory"]
+  @test_dll = yml["test_dll"]
+  @test_runner_command = "#{ yml["test_runner"] } #{ @test_dll }"
   
   @iis_express = IISExpress.new
   @web_deploy = WebDeploy.new
   @sh = CommandShell.new
-  @sln = SlnBuilder.new  
+  @sln = SlnBuilder.new
+  @file_sync = FileSync.new
+  @file_sync.source = @mvc_project_directory
+  @file_sync.destination = @website_deploy_directory
 end
 
 desc "builds and deploys website to directories iis express will use to run app"
@@ -36,7 +42,7 @@ task :deploy => :rake_dot_net_initialize do
 end
 
 desc "start iis express for MVC app"
-task :server => :rake_dot_net_initialize do |t, args|
+task :server => :rake_dot_net_initialize do
   sh @iis_express.command @website_deploy_directory, @website_port
 end
 
@@ -54,6 +60,11 @@ end
 desc "run nspec tests"
 task :tests => :build do
   sh @test_runner_command
+end
+
+desc "synchronizes a file specfied to the website deployment directory"
+task :sync => :rake_dot_net_initialize do |t, args|
+  @file_sync.sync args[:file]
 end
 
 def reset_db

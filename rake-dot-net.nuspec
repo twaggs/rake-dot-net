@@ -2,7 +2,7 @@
 <package> 
   <metadata> 
     <id>rake-dot-net</id> 
-    <version>1.0.5</version> 
+    <version>1.0.7</version> 
     <authors>Amir Rajan</authors>
     <description>RakeDotNet is a set of rake tasks that help wean yourself of the Visual Studio IDE</description> 
     <language>en-US</language>
@@ -15,7 +15,9 @@
     <file src="lib/iis_express.rb" target="src/RakeDotNet/iis_express.rb" />
     <file src="lib/sln_builder.rb" target="src/RakeDotNet/sln_builder.rb" />
     <file src="lib/web_deploy.rb" target="src/RakeDotNet/web_deploy.rb" />
+    <file src="lib/file_sync.rb" target="src/RakeDotNet/file_sync.rb" />
     <file src="lib/RakeFile.rb" target="src/RakeFile.rb" />
+    <file src="lib/dev.yml" target="src/dev.yml" />
     <file src="install.ps1" target="tools/install.ps1" />
   </files>
 </package>
