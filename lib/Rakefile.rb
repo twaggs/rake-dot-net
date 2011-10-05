@@ -14,9 +14,10 @@ task :rake_dot_net_initialize do
   yml = YAML::load File.open("dev.yml")
   @website_port = yml["website_port"]
   @website_deploy_directory = yml["website_deploy_directory"]
-  @solution_name = yml["solution_name"]
-  @mvc_project_directory = yml["mvc_project_directory"]
-  @test_dll = yml["test_dll"]
+  @solution_name = "#{ yml["solution_name"] }.sln"
+  @mvc_project_directory = yml["mvc_project"]
+  @test_dll = "./#{ yml["test_project"] }/bin/debug/#{ yml["test_project"] }.dll"
+
   @test_runner_command = "#{ yml["test_runner"] } #{ @test_dll }"
   
   @iis_express = IISExpress.new
