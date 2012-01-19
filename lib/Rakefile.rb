@@ -18,6 +18,7 @@ task :rake_dot_net_initialize do
   @mvc_project_directory = yml["mvc_project"]
   @test_dll = "./#{ yml["test_project"] }/bin/debug/#{ yml["test_project"] }.dll"
 
+  @test_runner_path = yml["test_runner"]
   @test_runner_command = "#{ yml["test_runner"] } #{ @test_dll }"
   
   @iis_express = IISExpress.new
@@ -66,7 +67,8 @@ end
 
 desc "run nspec tests"
 task :tests => :build do
-  sh @test_runner_command
+  puts "Could not find the NSpec test runner at location #{ @test_runner_path }, update your dev.yml to point to the correct runner location." if !File.exists? @test_runner_path
+  sh @test_runner_command if File.exists? @test_runner_path
 end
 
 desc "synchronizes a file specfied to the website deployment directory"
