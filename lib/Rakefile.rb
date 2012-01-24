@@ -60,6 +60,11 @@ task :reset => :rake_dot_net_initialize do
   reset_db
 end
 
+desc "if you have the nuget package oak installed, use this to export scripts to .sql files"
+task :export => :rake_dot_net_initialize do
+  puts Net::HTTP.post_form(URI.parse("http://localhost:#{@website_port.to_s}/seed/Export"), { })
+end
+
 desc "run nspec tests"
 task :tests => :build do
   puts "Could not find the NSpec test runner at location #{ @test_runner_path }, update your dev.yml to point to the correct runner location." if !File.exists? @test_runner_path
