@@ -92,6 +92,7 @@ task :simulate_load_balance => :rake_dot_net_initialize do
   @web_deploy.deploy @mvc_project_directory, @website_deploy_directory_load_balanced_2
   sh @iis_express.command @website_deploy_directory_load_balanced_1, @website_port_load_balanced_1
   sh @iis_express.command @website_deploy_directory_load_balanced_2, @website_port_load_balanced_2
+  generate_nginx_config
   cd "nginx"
   puts "starting nginx (pronouced engine-x) for round robin load balancing"
   sh "start nginx.exe"
@@ -105,4 +106,14 @@ task :stop_nginx do
   cd "nginx"
   sh "nginx.exe -s quit"
   cd ".."
+end
+
+def generate_nginx_config
+  File.chmod(0777, "nginx/conf/nginx.conf.template")
+  content = File.read("nginx/conf/nginx.conf.template")
+  newcontent = content.gsub /website_port/, @website_port.to_s
+  newcontent = content.gsub /website_port_load_balanced_1/, @website_port_load_balanced_1.to_s
+  newcontent = content.gsub /website_port_load_balanced_2/, @website_port_load_balanced_2.to_s
+  
+  File.open("nginx/conf/nginx.conf.template", 'w') { |f| f.write(newcontent) }
 end
