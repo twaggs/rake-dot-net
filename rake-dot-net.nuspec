@@ -2,7 +2,7 @@
 <package> 
   <metadata> 
     <id>rake-dot-net</id> 
-    <version>1.3.2</version> 
+    <version>1.3.4</version> 
     <authors>Amir Rajan</authors>
     <description>RakeDotNet is a set of rake tasks that help wean yourself of the Visual Studio IDE</description> 
     <language>en-US</language>
