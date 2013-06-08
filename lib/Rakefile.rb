@@ -62,12 +62,15 @@ end
 
 desc "if you have the nuget package oak installed, use this to seed sample data"
 task :sample => :rake_dot_net_initialize do
+  puts "you can run 'rake export' to generate the sql files"
   reset_db
   puts Net::HTTP.post_form(URI.parse("http://localhost:#{@website_port.to_s}/seed/SampleEntries"), { })
 end
 
 desc "if you have the nuget package oak installed, use this to reset the database"
 task :reset => :rake_dot_net_initialize do
+  puts "you can run 'rake export' to generate the sql files"
+
   reset_db
 end
 
