@@ -11,8 +11,8 @@ class SlnBuilder
   end
 
   def build(sln)
-    Dir.glob("**/bin").each { |f| FileUtils.rm_rf f }
-    Dir.glob("**/obj").each { |f| FileUtils.rm_rf f }
+    Dir.glob("**/bin").reject{ |f| f['node_modules'] }.each { |f| FileUtils.rm_rf f }
+    Dir.glob("**/obj").reject{ |f| f['node_modules'] }.each { |f| FileUtils.rm_rf f }
 
     @sh.execute command(sln)
   end
